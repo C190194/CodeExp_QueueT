@@ -10,6 +10,3 @@ export const theme = {
     error: '#f13a59',
   },
 }
-
-// Fonts
-// https://directory.vercel.app/

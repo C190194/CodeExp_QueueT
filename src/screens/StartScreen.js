@@ -9,7 +9,6 @@ import { SafeAreaView } from 'react-native';
 
 export default function StartScreen({ navigation }) {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
       <Background>
         <Logo />
         <Header>Login Template</Header>
@@ -29,6 +28,5 @@ export default function StartScreen({ navigation }) {
           Sign Up
       </Button>
       </Background>
-    // </SafeAreaView>
   )
 }
