@@ -10,6 +10,8 @@ import {
   ResetPasswordScreen,
   Dashboard,
 } from './src/screens'
+import AdminQueueStack from "./screens/AdminQueueStack";
+import NextNumberScreen from "./screens/NextNumberScreen";
 
 const Stack = createStackNavigator()
 
@@ -31,6 +33,8 @@ export default function App() {
             name="ResetPasswordScreen"
             component={ResetPasswordScreen}
           />
+          <Stack.Screen name="Admin Queue Stack" component={AdminQueueStack} />
+          <Stack.Screen name="Next Number Screen" component={NextNumberScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
