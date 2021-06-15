@@ -14,7 +14,7 @@ export default function Dashboard({ navigation }) {
         Your amazing app starts here. Open you favorite code editor and start
         editing this project.
       </Paragraph>
-      <Button
+      {/* <Button
         mode="outlined"
         onPress={() =>
           navigation.reset({
@@ -24,7 +24,7 @@ export default function Dashboard({ navigation }) {
         }
       >
         Logout
-      </Button>
+      </Button> */}
     </Background>
   )
 }
