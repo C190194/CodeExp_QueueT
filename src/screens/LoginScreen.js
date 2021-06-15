@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View, Keyboard } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -10,11 +10,31 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
+import firebase from "../../database/firebaseDB"
+require('firebase/auth')
 
+const auth = firebase.auth();
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
+
+  async function login() {
+    Keyboard.dismiss();
+    const userCredential = await auth.signInWithEmailAndPassword(
+      email.value,
+      password.value
+    ).then((userCredential) => {
+      console.log("Signed in!");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AppDrawer' }],
+      });
+    }).catch((error) => {
+      console.log("Error!");
+      setErrorText(error.message);
+    });
+  }
 
   const onLoginPressed = () => {
     const emailError = emailValidator(email.value)
@@ -24,6 +44,7 @@ export default function LoginScreen({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }
+    login()
     navigation.reset({
       index: 0,
       routes: [{ name: 'AppDrawer' }],
@@ -63,7 +84,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
-      <Button mode="contained" onPress={onLoginPressed}>
+      <Button mode="contained" onPress={login}>
         Login
       </Button>
       <View style={styles.row}>
