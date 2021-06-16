@@ -117,7 +117,7 @@ export default function AdminQueueScreen({ navigation, route }) {
     console.log(userID, orderID);
     let userRef = db.collection(`Users/${userID}/Appointments`);
     userRef
-      .doc(orderID)
+      .doc(orderID.toString())
       .delete()
       .then(() => {
         console.log("Order successfully deleted!");
