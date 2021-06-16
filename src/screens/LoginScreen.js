@@ -25,11 +25,19 @@ export default function LoginScreen({ navigation }) {
       email.value,
       password.value
     ).then((userCredential) => {
-      console.log("Signed in!");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'AppDrawer' }],
-      });
+      if (email.value === "admin@email.com" && password.value === "adminpassword"){
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Admin Queue Stack' }],
+        });
+
+      }else{
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AppDrawer' }],
+        });
+      }
+    
     }).catch((error) => {
       console.log("Error!");
       setErrorText(error.message);

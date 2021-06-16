@@ -76,9 +76,9 @@ export default function App() {
             headerShown: false,
           }}
           >
-          {/* <Stack.Screen name="StartScreen" component={StartScreen} />
+          <Stack.Screen name="StartScreen" component={StartScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} /> */}
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="AppDrawer" component={AppDrawer}/>
           <Stack.Screen
             name="ResetPasswordScreen"
