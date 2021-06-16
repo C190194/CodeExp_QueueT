@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
 import {
+  FlatList,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  ScrollView,
   TouchableOpacity,
-  FlatList,
   Button,
+  TouchableHighlight,
 } from "react-native";
+import { Modal, Portal, Provider } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { SwipeListView } from "react-native-swipe-list-view";
+import { NavigationContainer } from "@react-navigation/native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+const Tab = createMaterialTopTabNavigator();
 
 import { LogBox } from "react-native";
-
 LogBox.ignoreLogs(["Setting a timer"]);
 
 import firebase from "../database/firebaseDB";
-
 const db = firebase.firestore();
+
+const rowSwipeAnimatedValues = {};
 
 export default function AdminQueueScreen({ navigation, route }) {
   const [qArray, setQArray] = useState([]);
@@ -26,6 +33,20 @@ export default function AdminQueueScreen({ navigation, route }) {
   //const shopRef = db.collection(`Shops`);
   const qRef = db.collection(`Shops/${shopID}/Queue`);
   const pendingRef = db.collection(`Shops/${shopID}/Pending_Queue`);
+
+  // This is to set up the top right button
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          onPress={() => {
+            navigation.navigate("Notification Screen");
+          }}
+          title="Notification"
+        />
+      ),
+    });
+  });
 
   // Monitor route.params for changes and add order to the pending list
   useEffect(() => {
@@ -96,9 +117,8 @@ export default function AdminQueueScreen({ navigation, route }) {
 
   // This deletes absent numbers in the pending list
   function removePending() {
-    console.log("here");
     let d = new Date();
-    let time = d.getTime() - 5 * 1000;
+    let time = d.getTime() - 60 * 60 * 1000;
     for (let i = pendingArray.length - 1; i >= 0; i--) {
       if (pendingArray[i].Time < time) {
         pendingRef
@@ -118,74 +138,149 @@ export default function AdminQueueScreen({ navigation, route }) {
   function nextPerson() {
     removePending();
     let id;
-    if (pendingArray.length) {
-      id = pendingArray[0].id;
-      navigation.navigate("Next Number Screen", {
-        ...pendingArray[0],
-        ...{ shopID: shopID },
-      });
-    } else if (qArray.length) {
+    if (qArray.length) {
       id = qArray[0].id;
       navigation.navigate("Next Number Screen", {
         ...qArray[0],
+        ...{ shopID: shopID },
+      });
+    } else if (pendingArray.length) {
+      id = pendingArray[0].id;
+      navigation.navigate("Next Number Screen", {
+        ...pendingArray[0],
         ...{ shopID: shopID },
       });
     } else {
       id = null;
       console.log("No person in the queue");
     }
-
-    // To delete that item, we filter out the item we don't want
   }
+
+  // Delete a person from pending list
+  function deletePending(id) {
+    pendingRef
+      .doc(id)
+      .delete()
+      .then(() => {
+        console.log("Document successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  }
+
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+
+  const deleteRow = (rowMap, rowKey) => {
+    //deletePending(rowKey);
+    closeRow(rowMap, rowKey);
+    const newData = [...qArray];
+    const prevIndex = qArray.findIndex((item) => item.id === rowKey);
+    newData.splice(prevIndex, 1);
+    setQArray(newData);
+    console.log(newData);
+  };
+
+  const renderSwipeList = (data) => (
+    <TouchableHighlight
+      onPress={() => console.log("You touched me")}
+      style={styles.rowFront}
+      underlayColor={"#AAA"}
+    >
+      <View>
+        <Text> {data.item.Number} </Text>
+      </View>
+    </TouchableHighlight>
+  );
+
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.rowBack}>
+      <TouchableOpacity onPress={() => deleteRow(rowMap, data.item.id)}>
+        <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deletePending(data.item.id)}>
+        <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
+      </TouchableOpacity>
+    </View>
+  );
 
   // The function to render each row in our FlatList
-  function renderItem({ item }) {
-    if (item.Time) {
-      return (
-        <View
-          style={{
-            padding: 10,
-            paddingTop: 50,
-            paddingBottom: 50,
-            borderBottomColor: "#ccc",
-            backgroundColor: "#eee",
-            borderBottomWidth: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text>{item.Number}</Text>
-        </View>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            padding: 10,
-            paddingTop: 50,
-            paddingBottom: 50,
-            borderBottomColor: "#ccc",
-            borderBottomWidth: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text>{item.Number}</Text>
-        </View>
-      );
-    }
+  function renderFlatList({ item }) {
+    return (
+      <View
+        style={{
+          padding: 10,
+          paddingTop: 50,
+          paddingBottom: 50,
+          borderTopColor: "#ccc",
+          borderTopWidth: 1,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text>{item.Number}</Text>
+      </View>
+    );
   }
+
+  function PendingComponent() {
+    return (
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            width: "100%",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          <SwipeListView
+            data={pendingArray}
+            renderItem={renderSwipeList}
+            renderHiddenItem={renderHiddenItem}
+            leftOpenValue={45}
+            rightOpenValue={-45}
+            previewRowKey={"0"}
+            previewOpenValue={-40}
+            previewOpenDelay={0}
+            style={{ width: "80%" }}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={nextPerson}>
+            <Text style={{ fontSize: 20 }}>Next Customer</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function showPendingList() {
+    navigation.navigate("Pending List Screen", {
+      ...{ shopID: shopID },
+    });
+  }
+
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.listContainer}>
+      <Button
+        title="Show Pending List"
+        style={{ marginTop: 30 }}
+        onPress={showPendingList}
+      />
+      <View style={{ flex: 1, width: "100%" }}>
         <FlatList
-          data={
-            pendingArray.concat(qArray).length
-              ? pendingArray.concat(qArray)
-              : []
-          }
-          renderItem={renderItem}
+          data={qArray.length ? qArray : []}
+          renderItem={renderFlatList}
           style={{ width: "100%" }}
           //keyExtractor={(item) => item.id.toString()}
         />
@@ -197,18 +292,27 @@ export default function AdminQueueScreen({ navigation, route }) {
       </View>
     </View>
   );
+
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Queue" component={QueueComponent} />
+        <Tab.Screen name="Pending List" component={PendingComponent} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({
-  listContainer: {
-    flex: 1,
+  flatListContainer: {
+    //flex: 1,
     //height:100,
+
     backgroundColor: "#ffc",
     alignItems: "center",
-    justifyContent: "center",
+    //justifyContent: "center",
   },
   buttonContainer: {
-    flex: 1,
     backgroundColor: "#eee",
     width: "100%",
     position: "absolute",
@@ -221,5 +325,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#DDDDDD",
     padding: 70,
+  },
+
+  backTextWhite: {
+    color: "#FFF",
+  },
+  rowFront: {
+    alignItems: "center",
+    backgroundColor: "#CCC",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    justifyContent: "center",
+    height: 60,
+    borderRadius: 20,
+  },
+  rowBack: {
+    alignItems: "center",
+    backgroundColor: "red",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 20,
+  },
+  backRightBtn: {
+    alignItems: "center",
+    bottom: 0,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    width: 75,
+  },
+  backRightBtnRight: {
+    backgroundColor: "red",
+    right: 0,
   },
 });
