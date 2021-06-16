@@ -9,11 +9,13 @@ import { SafeAreaView } from 'react-native';
 import Constants from 'expo-constants';
 import Searchbar from '../screens/searchBar'
 import { theme } from '../core/theme'
+import { Icon } from 'react-native-elements'
+import Carousel from 'react-native-snap-carousel';
 	
 export default function MainScreen({ navigation }) {
   const [value, setValue] = useState()
   function updateSearch(value) {
-       //earch logic here
+       //search logic here
        console.log(value)
   }	
  const [modalVisible, setModalVisible] = useState(false);
@@ -23,11 +25,68 @@ export default function MainScreen({ navigation }) {
 		<StatusBar backgroundColor='black' /> 
         <View style={styles.container}>
 		<Text style={styles.title}> Start Queuing</Text>
+		<View style={{
+				  flexDirection: "row",
+				  justifyContent: 'center',
+				  alignItems: 'center'
+				  
+		}}>		
+				  <View style={{ padding: 10}}>
+				  <Icon
+					  reverse
+					  name='fitness-outline'
+					  type='ionicon'
+					  color='#e76f51'
+					  onPress={() => console.log('hello')}
+					  />
+					  <Text>Healthcare</Text>
+			    </View>
+				  <View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'				  }}>
+					  <Icon
+						  reverse
+						  name='pizza-outline'
+						  type='ionicon'
+						  color='#f4a261'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Dining</Text>
+				  </View>
+				  <View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'					  }}>
+					  <Icon
+						  reverse
+						  name='flower-outline'
+						  type='ionicon'
+						  color='#e9c46a'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Grooming</Text>
+				  </View>
+				  <View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'					  }}>
+					  <Icon
+						  reverse
+						  name='leaf-outline'
+						  type='ionicon'
+						  color='#2a9d8f'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Others</Text>
+				  </View>
+			  </View>
         <Searchbar
             value={value}
             updateSearch={updateSearch}
-            style={{ marginTop: '8%' }}
-        /> 
+            style={{ marginTop: '5%' }}
+		/>
+
 		<ScrollView>
 		    <Text style={styles.subtitle}> Popular on QueueTogether</Text>
 			<ScrollView horizontal={true}>
@@ -42,9 +101,9 @@ export default function MainScreen({ navigation }) {
              style={styles.profilePic}
              source={require('../assets/images/hairdresser1.jpg')}
             />
-			<Text style={styles.caption}>Queue Name</Text>
+			<Text style={styles.caption}>NAOKI Hair Dressing</Text>
 			<Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
-			<Text style={styles.address}>Insert first few words of Address</Text>
+			<Text style={styles.address}>4 Tampines Central 5, 03-10/11, Singapore 529510</Text>
 			</View>
 			</TouchableOpacity>
 
@@ -57,9 +116,9 @@ export default function MainScreen({ navigation }) {
 								  style={styles.profilePic}
 								  source={require('../assets/images/restaurant1.jpg')}
 							  />
-							  <Text style={styles.caption}>Queue Name</Text>
+							  <Text style={styles.caption}>Porta Porta Italian Restaurant</Text>
 							  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
-							  <Text style={styles.address}>Insert first few words of Address</Text>
+							  <Text style={styles.address}>No. 32 Jln Pari Burong, Singapore 488698</Text>
 						  </View>
 					  </TouchableOpacity>
 			
@@ -80,10 +139,10 @@ export default function MainScreen({ navigation }) {
 											  style={styles.modalPic}
 											  source={require('../assets/images/hairdresser1.jpg')}
 										  />
-										  <Text style={styles.caption}>Queue Name</Text>
-										  <Text style={styles.address}>Address of queue here</Text>
-										  <Text style={styles.modalText}>Brief description of the queue</Text>
-										  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+										  <Text style={styles.caption}>NAOKI Hair Dressing</Text>
+										  <Text style={styles.address}>4 Tampines Central 5, 03-10/11, Singapore 529510</Text>
+										  <Text style={styles.modalText}>Your one stop neighbourhood hairdressing salon offering a range of aesthetic services for you to get those beautfiful glossy locks today at a promotional rate! Visit our webpage to find out more! www.NAOKIsg.com</Text>
+										  <Text style={styles.estWaitTime}>Estimated Wait time: 10 mins</Text>
 										  <Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
 									  </View>
 									  <View style={{
@@ -117,10 +176,12 @@ export default function MainScreen({ navigation }) {
 												  style={styles.modalPic}
 												  source={require('../assets/images/restaurant1.jpg')}
 											  />
-											  <Text style={styles.caption}>Queue Name</Text>
-											  <Text style={styles.address}>Address of queue here</Text>
-											  <Text style={styles.modalText}>Brief description of the queue</Text>
-											  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+											  <Text style={styles.caption}>Porta Porta Italian Restaurant</Text>
+											  <Text style={styles.address}>No. 32 Jln Pari Burong, Singapore 488698</Text>
+											  <Text style={styles.modalText}>You can savour Southern Italian cuisine from our 'Fai te' set which means 'you do it', leaving everything to our chefs while you sit down and enjoy whatever our chefs feels like cooking for you. Or the House menu which serves a variety of anti pasti , pasta and main courses. Full of Southern Italian flavor of garlic, tomato and olive oil dishes with a pizzicare (hinch)of spice. Simple yet tasty.Porta-Porta transformed into a homely restaurant, opening our doors to our home cooked food with an ambiance that would make you feel like you are in someone's home in southern Italy."</Text>
+											  <Text style={styles.modalText}>Service Options: Dine-in, Takeaway </Text>
+											  <Text style={styles.modalText}>Opening Hour: Weekday 1230-1800 (not open on weekends)</Text>
+											  <Text style={styles.estWaitTime}>Estimated Wait time: 10 mins</Text>
 											  <Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
 										  </View>
 										  <View style={{
@@ -298,7 +359,10 @@ const styles = StyleSheet.create({
 	title: {
     marginTop: 60,
     color: 'black',
-    fontSize: 40,
+		fontSize: 40,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 10
     },
 	subtitle: {
     marginTop: 10,
