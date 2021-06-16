@@ -11,9 +11,9 @@ export default function StartScreen({ navigation }) {
   return (
       <Background>
         <Logo />
-        <Header>Login Template</Header>
+        <Header>QueueTogether</Header>
         <Paragraph>
-          Never worry about cost splitting again.
+          Queuing done safely and efficiently.
       </Paragraph>
         <Button
           mode="contained"
