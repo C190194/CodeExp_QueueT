@@ -7,8 +7,19 @@ import Button from '../components/Button'
 import { Text, View, StyleSheet, Image, ScrollView, FlatList, TouchableOpacity, TextInput, Alert, Modal, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import Constants from 'expo-constants';
+import firebase from "../../database/firebaseDB";
 import Searchbar from '../screens/searchBar'
 import { theme } from '../core/theme'
+
+//get shopid & userid
+//add to queue then update appointment in Queue Screen
+//display current queue number
+//display appointment
+//add waiting time
+//cancel appointment
+//notify shop when he in pending queue and arrive at shop
+
+=======
 	
 export default function MainScreen({ navigation }) {
   const [value, setValue] = useState()
@@ -16,6 +27,7 @@ export default function MainScreen({ navigation }) {
        //earch logic here
        console.log(value)
   }	
+  const [modalVisible, setModalVisible] = useState(false);
  const [modalVisible, setModalVisible] = useState(false);
  const [actionTriggered, setActionTriggered] = useState('');
   return (
@@ -69,6 +81,78 @@ export default function MainScreen({ navigation }) {
 				onRequestClose={() => {
 				  setModalVisible(!modalVisible);
 				}}
+			  >
+				<View style={styles.centeredView}>
+				  <View style={styles.modalView}>
+				    <View style = {{flex:8}}>
+					<Image
+					style={styles.modalPic}
+					source={require('../assets/images/hairdresser1.jpg')}
+					/>
+					<Text style={styles.caption}>Queue Name</Text>
+					<Text style={styles.address}>Address of queue here</Text>
+					<Text style={styles.modalText}>Brief description of the queue</Text>
+					<Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+					<Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
+					</View>
+					<View style={{ flexDirection:"row" ,
+								   justifyContent: 'flex-end',
+								   flex:1}}>
+					<Pressable
+					  style={[styles.button, styles.buttonClose]}
+					  onPress={() => 
+					    {
+						// const userName = email?
+						const db = firebase.firestore();
+						const UserID = "VOffdU0wx1T6Q6P2ql9h";
+						const apptRef = db.collection(`Users/${UserID}/Appointments`);
+						const shopID = "znXRQ1uBEdzRE50FjdgV";
+						const qRef = db.collection(`Shops/${shopID}/Queue`);
+						const shopRef=db.collection('Shops').doc(shopID);
+						var lastNum=shopRef.get().Last_Number;
+						console.log("last no. is " +lastNum);
+						qRef.add(
+									{
+									Number: 124, //by right is lastNum+1
+									UserID: UserID
+									}
+								)
+							.then( () =>{
+								console.log("User successfully added!");
+								setModalVisible(!modalVisible);
+							})
+							.catch((error) =>{
+								console.error("Error adding user: ", error);
+							})
+						//increase Last_Number by 1	
+						shopRef.update({
+							Last_Number : firebase.firestore.FieldValue.increment(1)
+						});
+
+						apptRef.add({
+							queueNumber: 124, //by right is lastNum+1,
+							shopID: shopID
+						})
+						.then( () =>{
+							console.log("Successfully added to user's appt");
+						})
+						.catch((error) =>{
+							console.error("Error adding to user's appt: ", error);
+						})
+					  }
+					}
+					>
+					  <Text style={styles.textStyle}>Join Queue</Text>
+					</Pressable>
+					<Pressable
+					  style={[styles.button, styles.buttonClose]}
+					  onPress={() => setModalVisible(!modalVisible)}
+					>
+					  <Text style={styles.textStyle}>Close</Text>
+					</Pressable>
+					</View>
+				  </View>
+				</View>
 			>
 			{/* inside the modal view, depending on the action type do something */}
 			{actionTriggered === 'ACTION_1' ?
