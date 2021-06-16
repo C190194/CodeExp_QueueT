@@ -24,9 +24,84 @@ import SelectionListHeader from '../components/SelectionListHeader';
 import images from '../components/allImages'
 import Searchbar from '../screens/searchBar'
 import {  View, StyleSheet  } from 'react-native';
+import firebase from "../../database/firebaseDB";
+const db = firebase.firestore();
 
-export default function QueueScreen({ navigation }) {
+export default function QueueScreen({navigation}) {
+// export default function QueueScreen(props) {
     //code to get the queues (with the following attributes) user logged in is in from database. 
+    // const [data , setData] = useState([])
+    const [items, setItems] = useState([]);
+    const [title, setTitle] = useState("")
+    
+    // const userID = props?.userID || "newid"
+    const userID  = "newid"
+
+    useEffect(()=>{
+        try{
+            let qRef= db.collection(`Shops`)
+            let ids = []
+            let names = []
+            let locations = []
+
+            // names of all shops
+            qRef
+            .get()
+            .then(querySnapshot => {
+              querySnapshot.forEach(documentSnapshot => {
+                if (documentSnapshot.id != "Number") {
+                  ids.push((documentSnapshot.id).toString())
+                  names.push(documentSnapshot.data().Name)
+                  locations.push(documentSnapshot.data().Location)
+                }
+              });
+              
+              // find which store are you queuing
+              let refs = []
+              let data = []
+              for( var i = 0 ; i <  ids.length;i ++){
+                let shopID = ids[i]
+                let shopName = names[i]
+                let location = locations[i]
+                let ref = db.collection(`Shops/${ids[i]}/Queue`)
+                ref
+                .get()
+                .then(querySnapshot => {
+                  querySnapshot.forEach(documentSnapshot => {
+                    if(documentSnapshot.data().Number !== undefined && documentSnapshot.data().UserID !== undefined){
+                      let no = documentSnapshot.data().Number
+                      let uid = documentSnapshot.data().UserID
+                      // @TODO conditional to check 
+                      if (uid == userID){
+                        let inner_data  = {
+                            id: shopID,
+                            name: shopName,
+                            address: location,
+                            waitingNumber: no,
+                            estimatedWaitTime: 10,
+                            contactNumber: 67839481
+                          }
+                          data.push(inner_data)
+                      }
+                    }
+                  }) 
+             
+                  setItems(data)
+                  if (data.length > 1)  {
+                    setTitle("You are in "+ data.length + " queues")
+                  }else{
+                    setTitle("You are in "+ data.length + " queue")
+                  }
+        
+                })     
+              }    
+            });
+        }catch(err){
+          console.log(err)
+        }
+      })
+  
+
     const mockItems = [
         {
             id: '1',
@@ -57,7 +132,7 @@ export default function QueueScreen({ navigation }) {
         });
         return selectionMode;
     }
-        const [items, setItems] = useState(mockItems);
+        // const [items, setItems] = useState(mockItems);
         const selectionMode = useSelectionChange(items);
 
         const toggleSelect = item => {
@@ -146,7 +221,7 @@ export default function QueueScreen({ navigation }) {
                             <Text>{item.name}</Text>
                             <Text style={{ color: "grey" }}>{item.address}</Text>
                             <Text style={{ color: "orange" }}>Queue number: {item.waitingNumber}</Text>
-                            <Text style={{ color: "orange" }}>Estimated wait time: {item.estimatedWaitTime} mins</Text>
+                            {/* <Text style={{ color: "orange" }}>Estimated wait time: {item.estimatedWaitTime} mins</Text> */}
                         </Body>
                     </Left>
                     
@@ -178,7 +253,8 @@ export default function QueueScreen({ navigation }) {
                   
                   <SelectionListHeader
                       selectionMode={selectionMode}
-                      title="You are in 2 queues."
+                    //   title='You are in ${}queues.'
+                    //  title = {title}
                       selectedItemsCount={items.filter(i => i.selected).length}
                       clearSelection={clearSelection}
                       selectActions={[
@@ -194,11 +270,18 @@ export default function QueueScreen({ navigation }) {
                       ]}
                   />
                   <Content>
-                      <List>
+                    {items.length == 0 ? null: 
+                        <List>
+                        {items.map(item => {
+                            return renderItem(item);
+                        })}
+                    </List>
+                    }               
+                      {/* <List>
                           {items.map(item => {
                               return renderItem(item);
                           })}
-                      </List>
+                      </List> */}
                   </Content>
               </Container>
           </Root>
