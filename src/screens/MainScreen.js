@@ -9,11 +9,78 @@ import { SafeAreaView } from 'react-native';
 import Constants from 'expo-constants';
 import Searchbar from '../screens/searchBar'
 import { theme } from '../core/theme'
+
 import { Icon } from 'react-native-elements'
 import Carousel from 'react-native-snap-carousel';
+
+import firebase from "../../database/firebaseDB";
+const db = firebase.firestore();
+
 	
-export default function MainScreen({ navigation }) {
+// export default function MainScreen({ navigation }) {
+export default function MainScreen(props) {
   const [value, setValue] = useState()
+  const userID = props?.userID || "newid"
+  
+  const addToQueue = async () =>{
+	//   @TODO
+	let shopID = "znXRQ1uBEdzRE50FjdgV";
+	let latestQueueNumber = 0
+	let newQueueNumber = 0
+	let isAdded = false
+	const qRef = db.collection(`Shops/${shopID}/Queue`);
+
+	try{
+		const unsubscribe = qRef.orderBy("Number").onSnapshot((collection) => {
+		// qRef.orderBy("Number").get((collection) => {
+			let updatedQueue = collection.docs.map((doc) => {
+			  if (doc.id != "Number") {
+				if (Number.isInteger(doc.data().Number)){
+				
+					latestQueueNumber = Math.max(parseInt(latestQueueNumber),parseInt(doc.data().Number))
+				}	
+			  }
+			  if(doc.data().UserID  == userID){
+				isAdded = true
+			  }
+			})
+			unsubscribe();
+			if(isAdded){
+				return Alert.alert("You are already queuing for the store")
+			}else{
+				newQueueNumber = latestQueueNumber + 1
+				console.log('object to be added =')
+				console.log(userID)
+				console.log(parseInt(newQueueNumber))
+
+				qRef.add({
+						Number: parseInt(newQueueNumber),
+						UserID: userID
+					}).then(() =>{
+						console.log("User successfully added!");
+						setModalVisible(!modalVisible);
+					})
+					.catch((error) =>{
+						// console.error("Error adding user: ", error);
+						return Alert.alert("An unexpected error occurred . Please try again later")
+					})
+			}
+		  });	
+	
+
+
+		
+
+		  
+
+	
+		  
+	}catch(err){
+		console.log(err)
+		return Alert.alert("An unexpected error occurred . Please try again later")
+	}
+
+  }
   function updateSearch(value) {
        //search logic here
        console.log(value)
@@ -152,10 +219,11 @@ export default function MainScreen({ navigation }) {
 									  }}>
 										  <Pressable
 											  style={[styles.button, styles.buttonClose]}
-											  onPress={() => {
-												  Alert.alert("You have joined the Queue!");
-												  setModalVisible(!modalVisible)
-											  }}
+											  onPress={(e) => {
+												// setModalVisible(!modalVisible)
+												addToQueue()
+											  }
+											}
 										  >
 											  <Text style={styles.textStyle}>Join Queue</Text>
 										  </Pressable>
