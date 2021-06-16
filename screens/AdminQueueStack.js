@@ -12,13 +12,13 @@ export default function NotesStack() {
         options={{
           title: "Admin Queue",
           headerStyle: {
-            backgroundColor: "yellow",
+            backgroundColor: "tomato",
             height: 100,
             shadowColor: "black",
             shadowOpacity: 0.2,
             shadowRadius: 5,
           },
-          headerTintColor: "#f55",
+          headerTintColor: "white",
           headerTitleStyle: {
             fontSize: 24,
             fontWeight: "bold",

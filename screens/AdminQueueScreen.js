@@ -10,6 +10,7 @@ import {
   TouchableHighlight,
   Dimensions,
 } from "react-native";
+import { Modal, Portal, Provider } from "react-native-paper";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 const Tab = createMaterialTopTabNavigator();
 
@@ -116,6 +117,7 @@ export default function AdminQueueScreen({ navigation, route }) {
   function deleteUserOrder(userID, orderID) {
     console.log(userID, orderID);
     let userRef = db.collection(`Users/${userID}/Appointments`);
+
     userRef
       .doc(orderID.toString())
       .delete()
@@ -126,7 +128,6 @@ export default function AdminQueueScreen({ navigation, route }) {
         console.error("Error removing document: ", error);
       });
   }
-  //deleteUserOrder("TestBuddy", "2b1vL8H1NoQiZNIyaKDB");
 
   // This deletes absent numbers in the pending list
   function removePending() {
@@ -165,6 +166,7 @@ export default function AdminQueueScreen({ navigation, route }) {
 
   // This deletes an individual note
   function nextPerson() {
+    console.log(qArray);
     removePending();
     let id;
     if (qArray.length) {
@@ -173,15 +175,10 @@ export default function AdminQueueScreen({ navigation, route }) {
         ...qArray[0],
         ...{ shopID: shopID },
       });
-    } else if (pendingArray.length) {
-      id = pendingArray[0].id;
-      navigation.navigate("Next Number Screen", {
-        ...pendingArray[0],
-        ...{ shopID: shopID },
-      });
     } else {
       id = null;
       console.log("No person in the queue");
+      showModal();
     }
   }
 
@@ -248,7 +245,7 @@ export default function AdminQueueScreen({ navigation, route }) {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={nextPerson}>
+        <TouchableOpacity style={styles.callButton} onPress={nextPerson}>
           <Text style={{ fontSize: 20 }}>Next Customer</Text>
         </TouchableOpacity>
       </View>
@@ -292,18 +289,28 @@ const styles = StyleSheet.create({
     //justifyContent: "center",
   },
   buttonContainer: {
-    backgroundColor: "#eee",
+    //backgroundColor: "#eee",
     width: "100%",
     position: "absolute",
-    bottom: 0,
+    bottom: 40,
     alignSelf: "center",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "center",
   },
-  button: {
+  callButton: {
+    alignSelf: "center",
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#DDDDDD",
-    padding: 70,
+    backgroundColor: "rgb(161, 252, 168)",
+    borderWidth: 3,
+    borderLeftColor: "green",
+    borderTopColor: "green",
+    borderRightColor: "green",
+    borderBottomColor: "green",
+    height: 70,
+    width: 250,
+    borderRadius: 10,
+    //padding: 70,
   },
 
   backTextWhite: {

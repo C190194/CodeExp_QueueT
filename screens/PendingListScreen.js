@@ -52,8 +52,25 @@ export default function AdminQueueScreen({ navigation, route }) {
     };
   }, []);
 
+  // Delete order from user database
+  function deleteUserOrder(userID, orderID) {
+    console.log(userID, orderID);
+    let userRef = db.collection(`Users/${userID}/Appointments`);
+
+    userRef
+      .doc(orderID.toString())
+      .delete()
+      .then(() => {
+        console.log("Order successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  }
+
   // Delete a person from pending list
-  function deletePending(id) {
+  function deletePending(uID, id) {
+    deleteUserOrder(uID, id);
     pendingRef
       .doc(id)
       .delete()
@@ -72,17 +89,23 @@ export default function AdminQueueScreen({ navigation, route }) {
       underlayColor={"#AAA"}
     >
       <View>
-        <Text> {data.item.Number} </Text>
+        <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+          {data.item.Number}
+        </Text>
       </View>
     </TouchableHighlight>
   );
 
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
-      <TouchableOpacity onPress={() => deletePending(data.item.id)}>
+      <TouchableOpacity
+        onPress={() => deletePending(data.item.UserID, data.item.id)}
+      >
         <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => deletePending(data.item.id)}>
+      <TouchableOpacity
+        onPress={() => deletePending(data.item.UserID, data.item.id)}
+      >
         <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
       </TouchableOpacity>
     </View>
