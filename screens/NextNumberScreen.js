@@ -95,9 +95,8 @@ export default function NextNumberScreen({ route, navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
-      <Text style={{ fontSize: 24 }}>{shopID}</Text>
-      <Text style={{ fontSize: 24 }}>Next Number to Serve: {Number}</Text>
-
+      <Text style={{ fontSize: 24 }}>Next Number to Serve: </Text>
+      <Text style={{ fontSize: 34 }}>{Number}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={serve}>
           <Text style={styles.buttonText}>Serve</Text>
