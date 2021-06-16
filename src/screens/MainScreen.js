@@ -4,7 +4,7 @@ import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
-import { Text, View, StyleSheet, Image, ScrollView, FlatList, TouchableOpacity, TextInput, Alert, Modal, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, FlatList, TouchableOpacity, TextInput, Alert, Modal, Pressable, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import Constants from 'expo-constants';
 import Searchbar from '../screens/searchBar'
@@ -19,7 +19,8 @@ export default function MainScreen({ navigation }) {
  const [modalVisible, setModalVisible] = useState(false);
  const [actionTriggered, setActionTriggered] = useState('');
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+	  <SafeAreaView style={{ flex: 1 }}>
+		<StatusBar backgroundColor='black' /> 
         <View style={styles.container}>
 		<Text style={styles.title}> Start Queuing</Text>
         <Searchbar
@@ -92,7 +93,10 @@ export default function MainScreen({ navigation }) {
 									  }}>
 										  <Pressable
 											  style={[styles.button, styles.buttonClose]}
-											  onPress={() => setModalVisible(!modalVisible)}
+											  onPress={() => {
+												  Alert.alert("You have joined the Queue!");
+												  setModalVisible(!modalVisible)
+											  }}
 										  >
 											  <Text style={styles.textStyle}>Join Queue</Text>
 										  </Pressable>
@@ -126,7 +130,10 @@ export default function MainScreen({ navigation }) {
 										  }}>
 											  <Pressable
 												  style={[styles.button, styles.buttonClose]}
-												  onPress={() => setModalVisible(!modalVisible)}
+												  onPress={() => {
+													  Alert.alert("You have joined the Queue!");
+													  setModalVisible(!modalVisible)
+												  }}
 											  >
 												  <Text style={styles.textStyle}>Join Queue</Text>
 											  </Pressable>
