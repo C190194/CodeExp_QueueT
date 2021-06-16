@@ -132,7 +132,7 @@ export default function AdminQueueScreen({ navigation, route }) {
   // This deletes absent numbers in the pending list
   function removePending() {
     let d = new Date();
-    let time = d.getTime() - 5 * 1000; // 5 mins
+    let time = d.getTime() - 5 * 60 * 1000; // 5 mins
     for (let i = pendingArray.length - 1; i >= 0; i--) {
       if (pendingArray[i].Time < time) {
         deleteUserOrder(pendingArray[i].UserID, pendingArray[i].id);
