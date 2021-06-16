@@ -9,7 +9,6 @@ import { SafeAreaView } from 'react-native';
 import Constants from 'expo-constants';
 import Searchbar from '../screens/searchBar'
 import { theme } from '../core/theme'
-//import Modal from 'react-native-modal';
 	
 export default function MainScreen({ navigation }) {
   const [value, setValue] = useState()
@@ -17,7 +16,8 @@ export default function MainScreen({ navigation }) {
        //earch logic here
        console.log(value)
   }	
-  const [modalVisible, setModalVisible] = useState(false);
+ const [modalVisible, setModalVisible] = useState(false);
+ const [actionTriggered, setActionTriggered] = useState('');
   return (
     <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -31,7 +31,11 @@ export default function MainScreen({ navigation }) {
 		    <Text style={styles.subtitle}> Popular on QueueTogether</Text>
 			<ScrollView horizontal={true}>
 			
-			<TouchableOpacity onPress={() => setModalVisible(true)}>
+					  <TouchableOpacity onPress={() => {
+						  setModalVisible(true);
+						  setActionTriggered('ACTION_1'); // HERE
+					  }}>
+
 			<View style = {styles.card}>
 			<Image
              style={styles.profilePic}
@@ -42,59 +46,103 @@ export default function MainScreen({ navigation }) {
 			<Text style={styles.address}>Insert first few words of Address</Text>
 			</View>
 			</TouchableOpacity>
+
+					  <TouchableOpacity onPress={() => {
+						  setModalVisible(true);
+						  setActionTriggered('ACTION_2'); // HERE
+					  }}>
+						  <View style={styles.card}>
+							  <Image
+								  style={styles.profilePic}
+								  source={require('../assets/images/restaurant1.jpg')}
+							  />
+							  <Text style={styles.caption}>Queue Name</Text>
+							  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+							  <Text style={styles.address}>Insert first few words of Address</Text>
+						  </View>
+					  </TouchableOpacity>
 			
 			<Modal 
 				animationType="slide"
 				transparent={true}
 				visible={modalVisible}
 				onRequestClose={() => {
-				  Alert.alert("Modal has been closed.");
 				  setModalVisible(!modalVisible);
 				}}
-			  >
-				<View style={styles.centeredView}>
-				  <View style={styles.modalView}>
-				    <View style = {{flex:8}}>
-					<Image
-					style={styles.modalPic}
-					source={require('../assets/images/hairdresser1.jpg')}
-					/>
-					<Text style={styles.caption}>Queue Name</Text>
-					<Text style={styles.address}>Address of queue here</Text>
-					<Text style={styles.modalText}>Brief description of the queue</Text>
-					<Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
-					<Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
-					</View>
-					<View style={{ flexDirection:"row" ,
-								   justifyContent: 'flex-end',
-								   flex:1}}>
-					<Pressable
-					  style={[styles.button, styles.buttonClose]}
-					  onPress={() => setModalVisible(!modalVisible)}
-					>
-					  <Text style={styles.textStyle}>Join Queue</Text>
-					</Pressable>
-					<Pressable
-					  style={[styles.button, styles.buttonClose]}
-					  onPress={() => setModalVisible(!modalVisible)}
-					>
-					  <Text style={styles.textStyle}>Close</Text>
-					</Pressable>
-					</View>
-				  </View>
-				</View>
+			>
+			{/* inside the modal view, depending on the action type do something */}
+			{actionTriggered === 'ACTION_1' ?
+							  <View style={styles.centeredView}>
+								  <View style={styles.modalView}>
+									  <View style={{ flex: 8 }}>
+										  <Image
+											  style={styles.modalPic}
+											  source={require('../assets/images/hairdresser1.jpg')}
+										  />
+										  <Text style={styles.caption}>Queue Name</Text>
+										  <Text style={styles.address}>Address of queue here</Text>
+										  <Text style={styles.modalText}>Brief description of the queue</Text>
+										  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+										  <Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
+									  </View>
+									  <View style={{
+										  flexDirection: "row",
+										  justifyContent: 'flex-end',
+										  flex: 1
+									  }}>
+										  <Pressable
+											  style={[styles.button, styles.buttonClose]}
+											  onPress={() => setModalVisible(!modalVisible)}
+										  >
+											  <Text style={styles.textStyle}>Join Queue</Text>
+										  </Pressable>
+										  <Pressable
+											  style={[styles.button, styles.buttonClose]}
+											  onPress={() => setModalVisible(!modalVisible)}
+										  >
+											  <Text style={styles.textStyle}>Close</Text>
+										  </Pressable>
+									  </View>
+								  </View>
+							  </View>:
+			actionTriggered === 'ACTION_2' ?
+								  <View style={styles.centeredView}>
+									  <View style={styles.modalView}>
+										  <View style={{ flex: 8 }}>
+											  <Image
+												  style={styles.modalPic}
+												  source={require('../assets/images/restaurant1.jpg')}
+											  />
+											  <Text style={styles.caption}>Queue Name</Text>
+											  <Text style={styles.address}>Address of queue here</Text>
+											  <Text style={styles.modalText}>Brief description of the queue</Text>
+											  <Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
+											  <Text style={styles.estWaitTime}>You are number 5 in the queue.</Text>
+										  </View>
+										  <View style={{
+											  flexDirection: "row",
+											  justifyContent: 'flex-end',
+											  flex: 1
+										  }}>
+											  <Pressable
+												  style={[styles.button, styles.buttonClose]}
+												  onPress={() => setModalVisible(!modalVisible)}
+											  >
+												  <Text style={styles.textStyle}>Join Queue</Text>
+											  </Pressable>
+											  <Pressable
+												  style={[styles.button, styles.buttonClose]}
+												  onPress={() => setModalVisible(!modalVisible)}
+											  >
+												  <Text style={styles.textStyle}>Close</Text>
+											  </Pressable>
+										  </View>
+									  </View>
+								  </View>:
+			null}
 			</Modal>
 			
-			
-			<View style = {styles.card}>
-			<Image
-             style={styles.profilePic}
-			 source={require('../assets/images/restaurant1.jpg')}
-            />
-			<Text style={styles.caption}>Queue Name</Text>
-			<Text style={styles.estWaitTime}>Est Wait time: 10 mins</Text>
-			<Text style={styles.address}>Insert first few words of Address</Text>
-			</View>
+
 			<View style = {styles.card}>
 			<Image
              style={styles.profilePic}
