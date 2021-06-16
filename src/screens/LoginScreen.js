@@ -62,8 +62,12 @@ export default function LoginScreen({ navigation }) {
   return (
     <Background>
        <BackButton goBack={navigation.goBack} />
-      <Logo /> 
-      <Header>Welcome back.</Header>
+      <Logo
+        style = {{position: 'relative'}}
+      /> 
+      <Header
+      style={{color: 'tomato', fontSize: 25}}
+      >Welcome back.</Header>
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -92,9 +96,10 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
-      <Button mode="contained" onPress={login}>
+      <Button mode="contained" onPress={login} style={{backgroundColor: 'tomato'}}>
         Login
       </Button>
+
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
