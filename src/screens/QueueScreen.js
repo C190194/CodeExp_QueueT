@@ -7,15 +7,16 @@ import Button from '../components/Button'
 import { Text } from 'react-native-paper'
 import { View,StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler'
 
 export default function QueueScreen({navigation}) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
-            <Text> QueueScreen </Text>
-            <Text> QueueScreen </Text>
-            <Text> QueueScreen </Text>
-            <Text> QueueScreen </Text>
+        <Text style={styles.title}> Your Appointments</Text>
+        <ScrollView>
+          
+        </ScrollView>
         </View>
      </SafeAreaView>
   )
@@ -30,4 +31,9 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
     },
+    title: {
+      marginTop: 60,
+      color: 'black',
+      fontSize: 40,
+      },
   })
