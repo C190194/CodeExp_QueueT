@@ -3,7 +3,7 @@ import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
-import { SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import {
     List,
@@ -26,14 +26,23 @@ import Searchbar from '../screens/searchBar'
 import {  View, StyleSheet  } from 'react-native';
 
 export default function QueueScreen({ navigation }) {
+    //code to get the queues (with the following attributes) user logged in is in from database. 
     const mockItems = [
         {
             id: '1',
-            name: 'Hairdresser 1',
+            name: 'NAOKI Hair Dressing',
+            address: '4 Tampines Central 5, 03-10/11, Singapore 529510',
+            waitingNumber: 1,
+            estimatedWaitTime: 10,
+            contactNumber: 67839481
         },
         {
             id: '2',
-            name: 'Restaurant 1',
+            name: 'Porta Porta Italian Restaurant',
+            address: 'No. 32 Jln Pari Burong, Singapore 488698',
+            waitingNumber: 2,
+            estimatedWaitTime: 4,
+            contactNumber: 93648261
         },
     ];
 
@@ -106,13 +115,14 @@ export default function QueueScreen({ navigation }) {
                    },
                    buttonIndex => {
                        if (buttonIndex == 0) {
-                           ActionSheet.hide()
+                           Alert.alert("Contact Queue Admin\n" + "Phone: " + JSON.stringify(item.contactNumber));
                            //Form.show(
                            //    { title: JSON.stringify(item.name).slice(1, -1) }
                            //)
                        }
                        else if (buttonIndex == 1) {
                            clearSelection();
+                           //insert code to delete from database
                        }
                        else {
                            ActionSheet.hide()
@@ -128,13 +138,15 @@ export default function QueueScreen({ navigation }) {
                     onPress={() => onPress(item)}
                     onLongPress={() => onLongPress(item)}
                     key={item.id}
+                    noIndent
                     style={[item.selected ? styles.selected : styles.normal]}>
                     <Left>
                         <Thumbnail large square source={images[item.id]} />
                         <Body>
                             <Text>{item.name}</Text>
-                            <Text>Insert Address here</Text>
-                            <Text>Insert waiting details here</Text>
+                            <Text style={{ color: "grey" }}>{item.address}</Text>
+                            <Text style={{ color: "orange" }}>Queue number: {item.waitingNumber}</Text>
+                            <Text style={{ color: "orange" }}>Estimated wait time: {item.estimatedWaitTime} mins</Text>
                         </Body>
                     </Left>
                     
@@ -291,5 +303,8 @@ const styles = StyleSheet.create({
         //borderRadius: 30,
         //overflow: "hidden",
         borderWidth: 5,
+    },
+    estWaitTime: {
+        color: 'orange',
     },
   })

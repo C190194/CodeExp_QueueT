@@ -10,6 +10,10 @@ import Constants from 'expo-constants';
 import Searchbar from '../screens/searchBar'
 import { theme } from '../core/theme'
 import firebase from "../../database/firebaseDB";
+
+
+import { Icon } from 'react-native-elements'
+import Carousel from 'react-native-snap-carousel';
 const db = firebase.firestore();
 	
 // export default function MainScreen({ navigation }) {
@@ -44,9 +48,6 @@ export default function MainScreen(props) {
 				return Alert.alert("You are already queuing for the store")
 			}else{
 				newQueueNumber = latestQueueNumber + 1
-				console.log('object to be added =')
-				console.log(userID)
-				console.log(parseInt(newQueueNumber))
 				let queueID='';
 				qRef.add({
 						Number: parseInt(newQueueNumber),
@@ -101,6 +102,63 @@ export default function MainScreen(props) {
 		<StatusBar backgroundColor='black' /> 
         <View style={styles.container}>
 		<Text style={styles.title}> Start Queuing</Text>
+
+		<View style={{
+				  flexDirection: "row",
+				  justifyContent: 'center',
+				  alignItems: 'center'
+				  
+		}}>		
+		<View style={{ padding: 10}}>
+				  <Icon
+					  reverse
+					  name='fitness-outline'
+					  type='ionicon'
+					  color='#e76f51'
+					  onPress={() => console.log('hello')}
+					  />
+					  <Text>Healthcare</Text>
+		</View>
+		<View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'				  }}>
+					  <Icon
+						  reverse
+						  name='pizza-outline'
+						  type='ionicon'
+						  color='#f4a261'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Dining</Text>
+		</View>
+		<View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'					  }}>
+					  <Icon
+						  reverse
+						  name='flower-outline'
+						  type='ionicon'
+						  color='#e9c46a'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Grooming</Text>
+		</View>
+		<View style={{
+					  padding: 10,
+					  justifyContent: 'center',
+					  alignItems: 'center'					  }}>
+					  <Icon
+						  reverse
+						  name='leaf-outline'
+						  type='ionicon'
+						  color='#2a9d8f'
+						  onPress={() => console.log('hello')}
+					  />
+					  <Text>Others</Text>
+				  </View>
+		</View>
         <Searchbar
             value={value}
             updateSearch={updateSearch}
