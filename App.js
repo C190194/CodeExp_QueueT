@@ -8,8 +8,7 @@ import {
   ProfileScreen,
   FavouriteScreen,
 } from './src/screens'
-import AdminQueueStack from "./screens/AdminQueueStack";
-import NextNumberScreen from "./screens/NextNumberScreen";
+
 import { theme } from './src/core/theme'
 import { Provider } from 'react-native-paper'
 import React from 'react';
@@ -19,6 +18,11 @@ import { NavigationContainer ,DrawerActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createStackNavigator} from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import AdminQueueStack from "./screens/AdminQueueStack";
+import NextNumberScreen from "./screens/NextNumberScreen";
+import NotificationScreen from "./screens/NotificationScreen";
+import PendingListScreen from "./screens/PendingListScreen";
+
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -71,16 +75,26 @@ export default function App() {
             headerShown: false,
           }}
           >
-          {/* <Stack.Screen name="StartScreen" component={StartScreen} />
+          <Stack.Screen name="StartScreen" component={StartScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} /> */}
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="AppDrawer" component={AppDrawer}/>
           <Stack.Screen
             name="ResetPasswordScreen"
             component={ResetPasswordScreen}
           />
-          <Stack.Screen name="Admin Queue Stack" component={AdminQueueStack} />
+          {/* <Stack.Screen name="Admin Queue Stack" component={AdminQueueStack} />
           <Stack.Screen name="Next Number Screen" component={NextNumberScreen} />
+          <Stack.Screen
+            name="Pending List Screen"
+            component={PendingListScreen}
+          />
+          <Stack.Screen
+            name="Notification Screen"
+            component={NotificationScreen}
+          /> */}
+
+          
         </Stack.Navigator>
     </NavigationContainer>
     </Provider>

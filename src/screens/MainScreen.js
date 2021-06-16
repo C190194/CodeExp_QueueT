@@ -47,19 +47,33 @@ export default function MainScreen(props) {
 				console.log('object to be added =')
 				console.log(userID)
 				console.log(parseInt(newQueueNumber))
-
+				let queueID='';
 				qRef.add({
 						Number: parseInt(newQueueNumber),
 						UserID: userID
-					}).then(() =>{
-						console.log("User successfully added!");
-						setModalVisible(!modalVisible);
+					}).then((docRef) => {
+						console.log("queueID: ", docRef.id); //print queueID
+						queueID = docRef.id;
+						// qRef.doc(queueID).add({queueID: queueID});
+						console.log("User successfully added!"); 
+						let Ref = db.collection("Users").doc("TestUser");
+						Ref.collection("Appointments").doc(queueID.toString()).set({
+							Number: parseInt(newQueueNumber),
+							ShopID: shopID,
+						
 					})
 					.catch((error) =>{
 						// console.error("Error adding user: ", error);
-						return Alert.alert("An unexpected error occurred . Please try again later")
-					})
-			}
+						return Alert.alert("An unexpected error occurred . Please try again later");
+					});
+				console.log("test"+queueID.toString());
+			
+				setModalVisible(!modalVisible);
+
+				});
+				console.log("test"+queueID.toString());
+
+		}
 		  });	
 	
 

@@ -8,12 +8,8 @@ import {
   TouchableOpacity,
   Button,
   TouchableHighlight,
+  Dimensions,
 } from "react-native";
-import { Modal, Portal, Provider } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import { SwipeListView } from "react-native-swipe-list-view";
-import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,7 +19,7 @@ LogBox.ignoreLogs(["Setting a timer"]);
 import firebase from "../database/firebaseDB";
 const db = firebase.firestore();
 
-const rowSwipeAnimatedValues = {};
+import cancelSender from "./SendCancelNotification";
 
 export default function AdminQueueScreen({ navigation, route }) {
   const [qArray, setQArray] = useState([]);
@@ -34,19 +30,19 @@ export default function AdminQueueScreen({ navigation, route }) {
   const qRef = db.collection(`Shops/${shopID}/Queue`);
   const pendingRef = db.collection(`Shops/${shopID}/Pending_Queue`);
 
-  // This is to set up the top right button
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPress={() => {
-            navigation.navigate("Notification Screen");
-          }}
-          title="Notification"
-        />
-      ),
-    });
-  });
+  // // This is to set up the top right button
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     headerRight: () => (
+  //       <Button
+  //         onPress={() => {
+  //           navigation.navigate("Notification Screen");
+  //         }}
+  //         title="Notification"
+  //       />
+  //     ),
+  //   });
+  // });
 
   // Monitor route.params for changes and add order to the pending list
   useEffect(() => {
@@ -61,8 +57,9 @@ export default function AdminQueueScreen({ navigation, route }) {
         .catch((error) => {
           console.error("Error removing document: ", error);
         });
+      let newID = route.params?.order.id;
       delete route.params?.order.id;
-      pendingRef.add(route.params?.order);
+      pendingRef.doc(newID).set(route.params?.order);
       delete route.params?.order.Time;
       delete route.params?.order.UserID;
       delete route.params?.order.Number;
@@ -115,12 +112,44 @@ export default function AdminQueueScreen({ navigation, route }) {
     };
   }, []);
 
+  // Delete order from user database
+  function deleteUserOrder(userID, orderID) {
+    console.log(userID, orderID);
+    let userRef = db.collection(`Users/${userID}/Appointments`);
+    userRef
+      .doc(orderID.toString())
+      .delete()
+      .then(() => {
+        console.log("Order successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  }
+  //deleteUserOrder("TestBuddy", "2b1vL8H1NoQiZNIyaKDB");
+
   // This deletes absent numbers in the pending list
   function removePending() {
     let d = new Date();
-    let time = d.getTime() - 60 * 60 * 1000;
+    let time = d.getTime() - 5 * 1000; // 5 mins
     for (let i = pendingArray.length - 1; i >= 0; i--) {
       if (pendingArray[i].Time < time) {
+        deleteUserOrder(pendingArray[i].UserID, pendingArray[i].id);
+        let userRef = db.collection(`Users`).doc(pendingArray[i].UserID);
+        userRef
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              cancelSender(doc.data().token);
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+            }
+          })
+          .catch((error) => {
+            console.log("Error getting document:", error);
+          });
+
         pendingRef
           .doc(pendingArray[i].id)
           .delete()
@@ -156,112 +185,28 @@ export default function AdminQueueScreen({ navigation, route }) {
     }
   }
 
-  // Delete a person from pending list
-  function deletePending(id) {
-    pendingRef
-      .doc(id)
-      .delete()
-      .then(() => {
-        console.log("Document successfully deleted!");
-      })
-      .catch((error) => {
-        console.error("Error removing document: ", error);
-      });
-  }
-
-  const closeRow = (rowMap, rowKey) => {
-    if (rowMap[rowKey]) {
-      rowMap[rowKey].closeRow();
-    }
-  };
-
-  const deleteRow = (rowMap, rowKey) => {
-    //deletePending(rowKey);
-    closeRow(rowMap, rowKey);
-    const newData = [...qArray];
-    const prevIndex = qArray.findIndex((item) => item.id === rowKey);
-    newData.splice(prevIndex, 1);
-    setQArray(newData);
-    console.log(newData);
-  };
-
-  const renderSwipeList = (data) => (
-    <TouchableHighlight
-      onPress={() => console.log("You touched me")}
-      style={styles.rowFront}
-      underlayColor={"#AAA"}
-    >
-      <View>
-        <Text> {data.item.Number} </Text>
-      </View>
-    </TouchableHighlight>
-  );
-
-  const renderHiddenItem = (data, rowMap) => (
-    <View style={styles.rowBack}>
-      <TouchableOpacity onPress={() => deleteRow(rowMap, data.item.id)}>
-        <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => deletePending(data.item.id)}>
-        <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
-      </TouchableOpacity>
-    </View>
-  );
-
-  // The function to render each row in our FlatList
-  function renderFlatList({ item }) {
-    return (
-      <View
-        style={{
-          padding: 10,
-          paddingTop: 50,
-          paddingBottom: 50,
-          borderTopColor: "#ccc",
-          borderTopWidth: 1,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text>{item.Number}</Text>
-      </View>
-    );
-  }
-
-  function PendingComponent() {
-    return (
-      <View style={{ flex: 1 }}>
-        <View
-          style={{
-            width: "100%",
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <SwipeListView
-            data={pendingArray}
-            renderItem={renderSwipeList}
-            renderHiddenItem={renderHiddenItem}
-            leftOpenValue={45}
-            rightOpenValue={-45}
-            previewRowKey={"0"}
-            previewOpenValue={-40}
-            previewOpenDelay={0}
-            style={{ width: "80%" }}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={nextPerson}>
-            <Text style={{ fontSize: 20 }}>Next Customer</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
   function showPendingList() {
     navigation.navigate("Pending List Screen", {
       ...{ shopID: shopID },
     });
+  }
+
+  // The function to render each row in our FlatList
+  const numColumns = 2;
+  function renderFlatList({ item }) {
+    return (
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1,
+          margin: 1,
+          height: Dimensions.get("window").width / numColumns, // approximate a square
+        }}
+      >
+        <Text style={styles.orderText}>{item.Number}</Text>
+      </View>
+    );
   }
 
   const [visible, setVisible] = React.useState(false);
@@ -270,21 +215,38 @@ export default function AdminQueueScreen({ navigation, route }) {
   const hideModal = () => setVisible(false);
   const containerStyle = { backgroundColor: "white", padding: 20 };
 
+  const formatData = (data, numColumns) => {
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+
+    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
+    while (
+      numberOfElementsLastRow !== numColumns &&
+      numberOfElementsLastRow !== 0
+    ) {
+      data.push({ key: `blank-${numberOfElementsLastRow}`, empty: true });
+      numberOfElementsLastRow++;
+    }
+
+    return data;
+  };
   return (
     <View style={{ flex: 1 }}>
-      <Button
-        title="Show Pending List"
-        style={{ marginTop: 30 }}
-        onPress={showPendingList}
-      />
+      <Text style={styles.numText}>
+        Currently {qArray.length} people in the queue{" "}
+      </Text>
+      <TouchableOpacity style={styles.pendButton} onPress={showPendingList}>
+        <Text style={{ fontSize: 20 }}>Display Pending List</Text>
+      </TouchableOpacity>
       <View style={{ flex: 1, width: "100%" }}>
         <FlatList
-          data={qArray.length ? qArray : []}
+          data={formatData(qArray.length ? qArray : [], numColumns)}
           renderItem={renderFlatList}
-          style={{ width: "100%" }}
+          style={{ marginVertical: 20, width: "100%" }}
+          numColumns={numColumns}
           //keyExtractor={(item) => item.id.toString()}
         />
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={nextPerson}>
           <Text style={{ fontSize: 20 }}>Next Customer</Text>
@@ -292,18 +254,35 @@ export default function AdminQueueScreen({ navigation, route }) {
       </View>
     </View>
   );
-
-  return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Queue" component={QueueComponent} />
-        <Tab.Screen name="Pending List" component={PendingComponent} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
 }
 
 const styles = StyleSheet.create({
+  numText: {
+    fontWeight: "bold",
+    fontSize: 15,
+    color: "rgba(255, 128, 0, 1)",
+    marginTop: 5,
+    padding: 5,
+    alignSelf: "center",
+  },
+  orderText: {
+    fontWeight: "bold",
+    fontSize: 25,
+    //color: "rgba(255, 128, 0, 1)",
+    padding: 5,
+  },
+  pendButton: {
+    alignSelf: "center",
+    alignItems: "center",
+    height: 30,
+    width: 200,
+    borderRadius: 10,
+    marginTop: 10,
+    //position: "absolute",
+    //top: 50,
+    //left: 50,
+    backgroundColor: "rgb(132, 214, 248)",
+  },
   flatListContainer: {
     //flex: 1,
     //height:100,

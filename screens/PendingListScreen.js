@@ -79,7 +79,7 @@ export default function AdminQueueScreen({ navigation, route }) {
 
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
-      <TouchableOpacity onPress={() => deletePending(rowMap, data.item.id)}>
+      <TouchableOpacity onPress={() => deletePending(data.item.id)}>
         <Feather name="trash-2" size={30} color="rgba(255, 255, 255, 1)" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => deletePending(data.item.id)}>
